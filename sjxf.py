@@ -148,6 +148,45 @@ def do(Authorization, userId):
                 starttime), json=stData, headers=headers)
         print(stRsponse.text)
 
+    # 积分明细
+    def jifen():
+        url = 'http://221.204.170.88:8184/app/home/totayScore'
+
+        payload = {'userId': userId,
+                   'type': '2'
+                   }
+        headers = {
+            'Pragma': 'no-cache',
+            'Cache-Control': 'no-cache',
+            'Authorization': Authorization,
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Redmi K20 Pro Premium Edition Build/QKQ1.190825.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045224 Mobile Safari/537.36',
+            'Content-Type': 'application/json',
+            'Origin': 'http: // sxzhdjkhd.sxdygbjy.gov.cn: 8081',
+            'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Connection': 'Keep-Alive',
+            'X-Requested-With': 'io.dcloud.H5B1841EE',
+            'Accept-Encoding': 'gzip, deflate',
+            'Accept': '*/*',
+            # 'Content - Length': '46',
+            'Referer': 'http: // sxzhdjkhd.sxdygbjy.gov.cn: 8081 / zhdj - pre / index.html',
+            'Host': '221.204.170.88:8184',
+        }
+        s = requests.session()
+        t = s.post(url, headers=headers, data=json.dumps(payload))
+        todayScore = json.loads(t.text)
+        print('今天增加了' + str(todayScore['data']['todayScore']) + '分，总分为' + str(todayScore['data']['yearScore']) + '分')
+        desp = '今天增加了' + str(todayScore['data']['todayScore']) + '分，总分为' + str(todayScore['data']['yearScore']) + '分'
+        print(desp)
+
+        # WXplusher
+        def rizhi():
+            appToken = 'yourappToken'  # 填自己的
+            uid = 'youruid'  # 填自己的
+            send_url = 'https://wxpusher.zjiecode.com/api/send/message/?appToken=' + appToken + '&content=' + desp + '&uid=' + uid
+            requests.get(send_url)
+
+        rizhi()
+
     # 答题
     dati("1")
     dati("1")
@@ -161,6 +200,11 @@ def do(Authorization, userId):
     # 阅读
     yd()
     yd()
+    # 积分明细
+    jifen()
+    # 日志提醒
+
+
 def login(username, password):
     url = 'http://221.204.170.88:8184/app/user/login'
     data = {"password": password, "deviceId": "5D2723AE-D386-48C3-AC49-586260EE7E79", "clientid": "236236",
@@ -178,7 +222,11 @@ def login(username, password):
     userInfo = json.loads(response.text)['data']
     info = json.loads(base64.b64decode(userInfo))
     return [info['jwtToken'], info['id']]
+
+
 def sjxx(username, password):
     JWT = login(username, password)
     do(JWT[0], JWT[1])
-sjxx("yourUsername", "yourPassword")
+
+
+sjxx("yourusername", "yourpassword")  # 填自己的账号密码
